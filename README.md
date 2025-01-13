@@ -1,6 +1,6 @@
 # Python Programming Exercises
 
-[![main](https://github.com/kokimoribe/python_exercises/actions/workflows/main.yml/badge.svg)](https://github.com/kokimoribe/python_exercises/actions/workflows/main.yml)
+[![main](https://github.com/kokimoribe/python_exercises/workflows/main.yml/badge.svg)](https://github.com/kokimoribe/python_exercises/workflows/main.yml)
 
 A collection of Python programming exercises designed to help learners practice coding fundamentals. Each exercise includes:
 - A clear problem description
