@@ -37,10 +37,12 @@ def py_to_notebook(py_file: Path, notebook_file: Path):
                 cell = nbformat.v4.new_markdown_cell(section.replace("#", "").strip())
                 cells.append(cell)
             else:
-                # Add %%ipytest magic to the beginning of each exercise cell
-                section_with_magic = "%%ipytest\n\n" + section.strip()
-                cell = nbformat.v4.new_code_cell(section_with_magic)
-                cells.append(cell)
+                # Combine section title and code into a single cell with %%ipytest
+                lines = section.strip().split('\n')
+                if lines[0].startswith('#'):  # It's a section title
+                    code = "%%ipytest\n\n" + section.strip()
+                    cell = nbformat.v4.new_code_cell(code)
+                    cells.append(cell)
 
         notebook.cells = cells
 
