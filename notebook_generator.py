@@ -1,6 +1,52 @@
 import nbformat
 from pathlib import Path
 
+# Documentation for the notebook
+NOTEBOOK_DOCS = """
+
+### Getting Started
+
+If you're not familiar with notebooks:
+
+https://chatgpt.com/share/6784782a-d7ac-8010-9dcf-9b5141e2a4ea
+
+### Key information
+
+- **Execute a Cell**: 
+  - `Shift+Enter` to execute and move to next cell
+  - `Ctrl+Enter` (Windows) or `⌘+Enter` (Mac) to execute and stay on current cell
+- **Edit a Cell**: Simply click inside any code cell to start editing
+- **Add a Cell**: Use the + button in the top menu or press `Ctrl+M B` (Windows) or `⌘+M B` (Mac)
+- **Dark Mode**: 
+  1. Click the three dots ⋮ in the top-right corner
+  2. Select 'Settings'
+  3. Choose 'Theme' → 'Dark'
+
+### Important First Steps
+1. **Run the Setup Cell**: Before starting the exercises, you **must** run the first code cell (marked 'Setup'). 
+   - This cell installs and configures the testing framework
+   - The first execution may take 1-2 minutes as Google Colab prepares your execution environment
+   - You'll know it's ready when you see a checkmark ✓ appear on the cell
+
+### Running the Exercises
+1. Each exercise contains:
+   - A function to implement
+   - A docstring explaining what to do
+   - Test cases to verify your solution
+2. Write your code in place of the `pass` statement
+3. Run the cell to check if your solution passes the tests
+4. A ✓ appears when all tests pass
+"""
+
+# Setup code for ipytest
+IPYTEST_SETUP = """# Setup
+try:
+    import ipytest
+except ImportError:
+    !pip install ipytest
+    import ipytest
+ipytest.autoconfig()"""
+
 def py_to_notebook(py_file: Path, notebook_file: Path):
     """
     Convert a Python file with exercise sections into a Jupyter notebook.
@@ -23,15 +69,11 @@ def py_to_notebook(py_file: Path, notebook_file: Path):
         notebook = nbformat.v4.new_notebook()
         cells = []
 
+        # Add documentation markdown cell
+        cells.append(nbformat.v4.new_markdown_cell(NOTEBOOK_DOCS))
+
         # Add setup cell for ipytest
-        setup_code = """try:
-    import ipytest
-except ImportError:
-    !pip install ipytest
-    import ipytest
-ipytest.autoconfig()"""
-        setup_cell = nbformat.v4.new_code_cell(setup_code)
-        cells.append(setup_cell)
+        cells.append(nbformat.v4.new_code_cell(IPYTEST_SETUP))
 
         # Process each section
         for i, section in enumerate(sections):
