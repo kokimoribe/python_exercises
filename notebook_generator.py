@@ -1,11 +1,15 @@
 import nbformat
 from pathlib import Path
 
-def py_to_notebook(py_file, notebook_file):
+def py_to_notebook(py_file: Path, notebook_file: Path):
     """
     Convert a Python file with exercise sections into a Jupyter notebook.
     Each section marked with '#################################################'
     will become its own cell, with any standalone comments merged into their following code.
+    
+    Args:
+        py_file (Path): Path to source Python file
+        notebook_file (Path): Path where notebook should be saved
     """
     try:
         # Read the Python file
@@ -41,7 +45,7 @@ def py_to_notebook(py_file, notebook_file):
         notebook.cells = cells
 
         # Ensure the output directory exists
-        Path(notebook_file).parent.mkdir(parents=True, exist_ok=True)
+        notebook_file.parent.mkdir(parents=True, exist_ok=True)
 
         # Write the notebook to file
         with open(notebook_file, "w", encoding="utf-8") as f:
@@ -54,14 +58,22 @@ def py_to_notebook(py_file, notebook_file):
     except Exception as e:
         print(f"An error occurred: {str(e)}")
 
-if __name__ == "__main__":
-    # List of Python files to convert
-    python_files = [
-        "exercises.py",
-        "2025_01_12.py",
-    ]
+def main():
+    # Define source and output directories
+    src_dir = Path("src")
+    notebooks_dir = Path("notebooks")
+
+    # Create notebooks directory if it doesn't exist
+    notebooks_dir.mkdir(exist_ok=True)
+
+    # Find all Python files in src directory
+    python_files = src_dir.glob("*.py")
 
     # Convert each file
     for py_file in python_files:
-        notebook_file = Path(py_file).with_suffix('.ipynb')
+        # Create corresponding notebook path
+        notebook_file = notebooks_dir / py_file.with_suffix('.ipynb').name
         py_to_notebook(py_file, notebook_file)
+
+if __name__ == "__main__":
+    main()
