@@ -22,9 +22,9 @@ https://chatgpt.com/share/6784782a-d7ac-8010-9dcf-9b5141e2a4ea
   3. Choose 'Theme' → 'Dark'
 
 #### Important First Steps
-1. **Run the Setup Cell**: Before starting the exercises, you **must** run the first code cell (marked 'Setup'). 
+1. **Run the Setup Cell**: Before starting the exercises, you **must** run the first code cell (marked 'Run this first!!!'). 
    - This cell installs and configures the testing framework
-   - The first execution may take 1-2 minutes as Google Colab prepares your execution environment
+   - The first execution may take ~10 seconds as Google Colab prepares your execution environment
    - You'll know it's ready when you see a checkmark ✓ appear on the cell
 
 #### Running the Exercises
