@@ -31,8 +31,9 @@ jobs:
       # Switch to publish branch and update notebooks
       - name: Commit to publish branch
         run: |
-          # Save the readme content before switching branches
+          # Save the readme content and notebooks before switching branches
           cp .github/publish-readme.md /tmp/publish-readme.md
+          cp -r notebooks /tmp/notebooks
           
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
@@ -42,9 +43,9 @@ jobs:
           # Clean the branch but keep .git directory
           git rm -rf .
           
-          # Copy saved readme and notebooks
+          # Copy saved files back
           cp /tmp/publish-readme.md README.md
-          cp -r notebooks .
+          cp -r /tmp/notebooks .
           
           # Commit and push changes
           git add README.md notebooks/
