@@ -1,8 +1,3 @@
-# Python Programming Exercises
-# Complete each function according to its docstring description.
-# Each section can be converted into a separate cell in your notebook.
-
-
 #################################################
 # Add Tuples to Set
 #################################################
