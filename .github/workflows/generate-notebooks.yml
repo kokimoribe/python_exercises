@@ -30,16 +30,21 @@ jobs:
       # Switch to publish branch and update notebooks
       - name: Commit to publish branch
         run: |
+          # Save the readme content before switching branches
+          cp .github/publish-readme.md /tmp/publish-readme.md
+          
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git fetch origin publish || git checkout --orphan publish
           git checkout publish || git checkout --orphan publish
+          
           # Clean the branch but keep .git directory
           git rm -rf .
-          # Copy README from main branch
-          cp .github/publish-readme.md README.md
-          # Copy notebooks directory preserving structure
+          
+          # Copy saved readme and notebooks
+          cp /tmp/publish-readme.md README.md
           cp -r notebooks .
+          
           # Commit and push changes
           git add README.md notebooks/
           git commit -m "Update notebooks from main branch" || echo "No changes to commit"
