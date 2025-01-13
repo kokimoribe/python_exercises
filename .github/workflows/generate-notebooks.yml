@@ -34,16 +34,13 @@ jobs:
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
           git fetch origin publish || git checkout --orphan publish
           git checkout publish || git checkout --orphan publish
-          # Clean the branch except notebooks
+          # Clean the branch but keep .git directory
           git rm -rf .
-          mkdir -p notebooks
-          # Copy generated notebooks
-          cp -r notebooks/* .
-          # Add a README if it doesn't exist
-          if [ ! -f README.md ]; then
-            echo "# Generated Notebooks\nThis branch contains automatically generated Jupyter notebooks." > README.md
-          fi
+          # Copy README from main branch
+          cp .github/publish-readme.md README.md
+          # Copy notebooks directory preserving structure
+          cp -r notebooks .
           # Commit and push changes
-          git add README.md *.ipynb
+          git add README.md notebooks/
           git commit -m "Update notebooks from main branch" || echo "No changes to commit"
           git push origin publish
