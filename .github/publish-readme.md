@@ -8,8 +8,8 @@ This branch contains automatically generated Jupyter notebooks for Python progra
 ## Using the Notebooks
 
 1. Navigate to the `notebooks` directory
-2. Click on any `.ipynb` file
-3. Open in Google Colab using the "Open in Colab" button
-4. Follow the instructions at the top of each notebook
+2. Open any `.ipynb` file to view its contents
+3. Look for the Google Colab badge at the top of the notebook to open it in Colab
+4. Follow the instructions in the notebook to get started
 
 For source code and more information, please visit the [main branch](https://github.com/kokimoribe/python_exercises).
