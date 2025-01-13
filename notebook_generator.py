@@ -2,11 +2,8 @@ import nbformat
 from pathlib import Path
 
 # Documentation for the notebook
+COLLAB_BADGE = """[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kokimoribe/python_exercises/blob/publish/notebooks/{notebook_name})"""
 NOTEBOOK_DOCS = """
-### README
-
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kokimoribe/python_exercises/blob/publish/notebooks/{notebook_name})
-
 If you're not familiar with notebooks:
 
 https://chatgpt.com/share/6784782a-d7ac-8010-9dcf-9b5141e2a4ea
@@ -73,8 +70,9 @@ def py_to_notebook(py_file: Path, notebook_file: Path):
 
         # Add documentation markdown cell with formatted Colab link
         notebook_name = notebook_file.name
-        docs_with_link = NOTEBOOK_DOCS.format(notebook_name=notebook_name)
-        cells.append(nbformat.v4.new_markdown_cell(docs_with_link))
+        cells.append(nbformat.v4.new_markdown_cell(COLLAB_BADGE.format(notebook_name=notebook_name)))
+        cells.append(nbformat.v4.new_markdown_cell("### README"))
+        cells.append(nbformat.v4.new_markdown_cell(NOTEBOOK_DOCS))
 
         # Add setup cell for ipytest
         cells.append(nbformat.v4.new_code_cell(IPYTEST_SETUP))
