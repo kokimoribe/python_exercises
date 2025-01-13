@@ -75,8 +75,8 @@ def py_to_notebook(py_file: Path, notebook_file: Path):
         cells.append(nbformat.v4.new_markdown_cell(NOTEBOOK_DOCS))
 
         # Add setup cell for ipytest
-        cells.append(nbformat.v4.new_code_cell(IPYTEST_SETUP))
         cells.append(nbformat.v4.new_markdown_cell("### Exercises"))
+        cells.append(nbformat.v4.new_code_cell(IPYTEST_SETUP))
 
         # Process each section
         for i, section in enumerate(sections):
