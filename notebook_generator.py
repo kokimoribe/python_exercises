@@ -41,7 +41,7 @@ https://chatgpt.com/share/6784782a-d7ac-8010-9dcf-9b5141e2a4ea
 """
 
 # Setup code for ipytest
-IPYTEST_SETUP = """# Setup
+IPYTEST_SETUP = """#@title Run this first!!!
 try:
     import ipytest
 except ImportError:
@@ -88,14 +88,18 @@ def py_to_notebook(py_file: Path, notebook_file: Path):
                 cell = nbformat.v4.new_markdown_cell(section.replace("#", "").strip())
                 cells.append(cell)
             else:
-                # Split into lines and skip the section title line
+                # Split into lines and get the title
                 lines = section.strip().split('\n')
                 if lines[0].strip().startswith('#'):
+                    # Extract title from the comment block
+                    title = lines[0].strip('# \n')
+                    # Remove the title line
                     lines = lines[1:]
                 
                 # Only create cell if there's content after removing title
                 if lines:
-                    code = "%%ipytest\n\n" + '\n'.join(lines).strip()
+                    # Add title directive and ipytest magic
+                    code = f"#@title {title}\n%%ipytest\n\n" + '\n'.join(lines).strip()
                     cells.append(nbformat.v4.new_code_cell(code))
 
         notebook.cells = cells
