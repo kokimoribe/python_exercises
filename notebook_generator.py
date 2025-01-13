@@ -24,7 +24,12 @@ def py_to_notebook(py_file: Path, notebook_file: Path):
         cells = []
 
         # Add setup cell for ipytest
-        setup_code = "!pip install ipytest\n\nimport ipytest\nipytest.autoconfig()"
+        setup_code = """try:
+    import ipytest
+except ImportError:
+    !pip install ipytest
+    import ipytest
+ipytest.autoconfig()"""
         setup_cell = nbformat.v4.new_code_cell(setup_code)
         cells.append(setup_cell)
 
@@ -37,12 +42,15 @@ def py_to_notebook(py_file: Path, notebook_file: Path):
                 cell = nbformat.v4.new_markdown_cell(section.replace("#", "").strip())
                 cells.append(cell)
             else:
-                # Combine section title and code into a single cell with %%ipytest
+                # Split into lines and skip the section title line
                 lines = section.strip().split('\n')
-                if lines[0].startswith('#'):  # It's a section title
-                    code = "%%ipytest\n\n" + section.strip()
-                    cell = nbformat.v4.new_code_cell(code)
-                    cells.append(cell)
+                if lines[0].strip().startswith('#'):
+                    lines = lines[1:]
+                
+                # Only create cell if there's content after removing title
+                if lines:
+                    code = "%%ipytest\n\n" + '\n'.join(lines).strip()
+                    cells.append(nbformat.v4.new_code_cell(code))
 
         notebook.cells = cells
 
