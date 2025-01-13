@@ -1,25 +1,49 @@
 name: Generate Notebooks
 on:
   push:
+    branches: [ main ]
     paths:
-      - '*.py'
-      - '!*.ipynb'
+      - 'src/**'
+      - 'notebook_generator.py'
+  workflow_dispatch:  # Allow manual triggering
+
 jobs:
-  generate:
+  generate-notebooks:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
-      - run: pip install nbformat
-      - run: python notebook_generator.py
-      - name: Commit notebooks
+          python-version: '3.12'
+          
+      - name: Install dependencies
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add *.ipynb
-          git commit -m "Auto-generate notebooks" || exit 0
-          git push 
+          python -m pip install --upgrade pip
+          pip install nbformat
+      
+      # Generate notebooks
+      - name: Generate notebooks
+        run: python notebook_generator.py
+      
+      # Switch to publish branch and update notebooks
+      - name: Commit to publish branch
+        run: |
+          git config --global user.name 'github-actions[bot]'
+          git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+          git fetch origin publish || git checkout --orphan publish
+          git checkout publish || git checkout --orphan publish
+          # Clean the branch except notebooks
+          git rm -rf .
+          mkdir -p notebooks
+          # Copy generated notebooks
+          cp -r notebooks/* .
+          # Add a README if it doesn't exist
+          if [ ! -f README.md ]; then
+            echo "# Generated Notebooks\nThis branch contains automatically generated Jupyter notebooks." > README.md
+          fi
+          # Commit and push changes
+          git add README.md *.ipynb
+          git commit -m "Update notebooks from main branch" || echo "No changes to commit"
+          git push origin publish
