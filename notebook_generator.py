@@ -3,6 +3,7 @@ from pathlib import Path
 
 # Documentation for the notebook
 NOTEBOOK_DOCS = """
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kokimoribe/python_exercises/blob/publish/notebooks/{notebook_name})
 
 ### Getting Started
 
@@ -10,7 +11,6 @@ If you're not familiar with notebooks:
 
 https://chatgpt.com/share/6784782a-d7ac-8010-9dcf-9b5141e2a4ea
 
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kokimoribe/python_exercises/blob/publish/notebooks/{notebook_name})
 
 ### Key information
 
@@ -20,7 +20,7 @@ https://chatgpt.com/share/6784782a-d7ac-8010-9dcf-9b5141e2a4ea
 - **Edit a Cell**: Simply click inside any code cell to start editing
 - **Add a Cell**: Use the + button in the top menu or press `Ctrl+M B` (Windows) or `⌘+M B` (Mac)
 - **Dark Mode**: 
-  1. Click the three dots ⋮ in the top-right corner
+  1. Click on 'Tools' in the top menubar
   2. Select 'Settings'
   3. Choose 'Theme' → 'Dark'
 
