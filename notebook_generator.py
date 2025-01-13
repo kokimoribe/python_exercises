@@ -3,16 +3,16 @@ from pathlib import Path
 
 # Documentation for the notebook
 NOTEBOOK_DOCS = """
-[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kokimoribe/python_exercises/blob/publish/notebooks/{notebook_name})
+### README
 
-### Getting Started
+[![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/kokimoribe/python_exercises/blob/publish/notebooks/{notebook_name})
 
 If you're not familiar with notebooks:
 
 https://chatgpt.com/share/6784782a-d7ac-8010-9dcf-9b5141e2a4ea
 
 
-### Key information
+#### Key information
 
 - **Execute a Cell**: 
   - `Shift+Enter` to execute and move to next cell
@@ -24,13 +24,13 @@ https://chatgpt.com/share/6784782a-d7ac-8010-9dcf-9b5141e2a4ea
   2. Select 'Settings'
   3. Choose 'Theme' → 'Dark'
 
-### Important First Steps
+#### Important First Steps
 1. **Run the Setup Cell**: Before starting the exercises, you **must** run the first code cell (marked 'Setup'). 
    - This cell installs and configures the testing framework
    - The first execution may take 1-2 minutes as Google Colab prepares your execution environment
    - You'll know it's ready when you see a checkmark ✓ appear on the cell
 
-### Running the Exercises
+#### Running the Exercises
 1. Each exercise contains:
    - A function to implement
    - A docstring explaining what to do
@@ -78,6 +78,7 @@ def py_to_notebook(py_file: Path, notebook_file: Path):
 
         # Add setup cell for ipytest
         cells.append(nbformat.v4.new_code_cell(IPYTEST_SETUP))
+        cells.append(nbformat.v4.new_markdown_cell("### Exercises"))
 
         # Process each section
         for i, section in enumerate(sections):
