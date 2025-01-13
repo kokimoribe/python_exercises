@@ -5,6 +5,7 @@ on:
     paths:
       - 'src/**'
       - 'notebook_generator.py'
+      - '.github/workflows/**'
   workflow_dispatch:  # Allow manual triggering
 
 jobs:
