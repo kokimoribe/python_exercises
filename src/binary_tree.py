@@ -34,10 +34,7 @@ def create_tree(values):
         i += 1
     return root
 
-#################################################
-# Pre-order Traversal
-#################################################
-
+# EXERCISE: Pre-order Traversal
 def preorder_traversal(root):
     """
     Implement a function that performs a pre-order traversal of a binary tree

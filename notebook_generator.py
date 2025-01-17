@@ -81,69 +81,67 @@ def generate_home_notebook(notebooks_dir: Path):
     
     print(f"Generated home notebook at {home_file}")
 
+def split_into_sections(content: str) -> list[str]:
+    """Split file content into sections based on '# EXERCISE:' and '# Setup' markers."""
+    lines = content.split('\n')
+    sections = []
+    current_section = []
+    
+    for line in lines:
+        if line.strip().startswith('# EXERCISE:') or line.strip().startswith('# Setup'):
+            if current_section:  # Save previous section if it exists
+                sections.append('\n'.join(current_section))
+                current_section = []
+        current_section.append(line)
+    
+    if current_section:  # Add the last section
+        sections.append('\n'.join(current_section))
+    
+    return sections
+
 def py_to_notebook(py_file: Path, notebook_file: Path):
     """
-    Convert a Python file with exercise sections into a Jupyter notebook.
-    Each section marked with '#################################################'
-    will become its own cell, with any standalone comments merged into their following code.
-    
-    Args:
-        py_file (Path): Path to source Python file
-        notebook_file (Path): Path where notebook should be saved
+    Convert a Python file into a Jupyter notebook.
+    Each section starting with '# EXERCISE:' or '# Setup' becomes its own cell.
     """
     try:
         # Read the Python file
         with open(py_file, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # Split the file into sections based on the delimiter
-        sections = [s.strip() for s in content.split("#################################################")]
+        # Split into sections
+        sections = split_into_sections(content)
         
         # Create notebook
         notebook = nbformat.v4.new_notebook()
         cells = []
 
-        # Add documentation markdown cell with formatted Colab link
+        # Add documentation cells
         notebook_name = notebook_file.name
         cells.append(nbformat.v4.new_markdown_cell(COLLAB_BADGE.format(notebook_name=notebook_name)))
         cells.append(nbformat.v4.new_markdown_cell(EXERCISE_DOCS))
 
-        # Extract setup code if it exists (first section starting with "# Setup")
+        # Process sections
         custom_setup = ""
-        if sections and sections[0].strip().startswith("# Setup"):
-            custom_setup = "\n".join(sections[0].split('\n')[1:])  # Skip the "# Setup" line
-            sections = sections[1:]  # Remove setup section from further processing
+        for section in sections:
+            if section.strip().startswith('# Setup'):
+                # Extract setup code
+                custom_setup = '\n'.join(section.split('\n')[1:])  # Skip the "# Setup" line
+            elif section.strip().startswith('# EXERCISE:'):
+                # Extract title
+                first_line = section.split('\n')[0]
+                title = first_line.replace('# EXERCISE:', '').strip()
+                # Create exercise cell
+                code = f"#@title {title}\n%%ipytest\n\n" + '\n'.join(section.split('\n')[1:])
+                cells.append(nbformat.v4.new_code_cell(code))
 
-        # Add setup cell with custom code if any
+        # Add setup cell after documentation but before exercises
         setup_code = IPYTEST_SETUP.format(custom_setup=custom_setup)
-        cells.append(nbformat.v4.new_code_cell(setup_code))
-
-        # Process remaining sections
-        for i, section in enumerate(sections):
-            if not section.strip():  # Skip empty sections
-                continue
-                
-            if i == 0:  # First non-empty section becomes markdown header
-                cell = nbformat.v4.new_markdown_cell(section.replace("#", "").strip())
-                cells.append(cell)
-            else:
-                # Split into lines and get the title
-                lines = section.strip().split('\n')
-                if lines[0].strip().startswith('#'):
-                    # Extract title from the comment block
-                    title = lines[0].strip('# \n')
-                    # Remove the title line
-                    lines = lines[1:]
-                
-                # Only create cell if there's content after removing title
-                if lines:
-                    # Add title directive and ipytest magic
-                    code = f"#@title {title}\n%%ipytest\n\n" + '\n'.join(lines).strip()
-                    cells.append(nbformat.v4.new_code_cell(code))
+        cells.insert(2, nbformat.v4.new_code_cell(setup_code))
 
         notebook.cells = cells
 
-        # Ensure the output directory exists
+        # Write the notebook
         notebook_file.parent.mkdir(parents=True, exist_ok=True)
         with open(notebook_file, "w", encoding="utf-8") as f:
             nbformat.write(notebook, f)
