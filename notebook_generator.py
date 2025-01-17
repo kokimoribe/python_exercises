@@ -22,7 +22,7 @@ https://chatgpt.com/share/6784782a-d7ac-8010-9dcf-9b5141e2a4ea
   3. Choose 'Theme' → 'Dark'
 
 #### Important First Steps
-1. **Run the Setup Cell**: Before starting the exercises, you **must** run the first code cell (marked 'Run this first!!!'). 
+1. **Run the Setup Cell**: Before starting any exercise notebook, you **must** run the first code cell (marked 'Run this first!!!'). 
    - This cell installs and configures the testing framework
    - The first execution may take ~10 seconds as Google Colab prepares your execution environment
    - You'll know it's ready when you see a checkmark ✓ appear on the cell
@@ -35,16 +35,51 @@ https://chatgpt.com/share/6784782a-d7ac-8010-9dcf-9b5141e2a4ea
 2. Write your code in place of the `pass` statement
 3. Run the cell to check if your solution passes the tests
 4. A ✓ appears when all tests pass
+
+### Available Notebooks
 """
 
-# Setup code for ipytest
+# Documentation for exercise notebooks
+EXERCISE_DOCS = """Need help? Visit the [Home](https://colab.research.google.com/github/kokimoribe/python_exercises/blob/publish/notebooks/home.ipynb) notebook for detailed instructions"""
+
+# Setup code for ipytest and any custom setup
 IPYTEST_SETUP = """#@title Run this first!!!
 try:
     import ipytest
 except ImportError:
     !pip install ipytest
     import ipytest
-ipytest.autoconfig()"""
+ipytest.autoconfig()
+
+# Custom setup code for this notebook (if any)
+{custom_setup}"""
+
+def generate_home_notebook(notebooks_dir: Path):
+    """Generate a home notebook with links to all exercise notebooks."""
+    notebook = nbformat.v4.new_notebook()
+    cells = []
+    
+    # Add documentation
+    cells.append(nbformat.v4.new_markdown_cell(NOTEBOOK_DOCS))
+    
+    # Add links to all notebooks
+    links = []
+    for nb_file in sorted(notebooks_dir.glob("*.ipynb")):
+        if nb_file.name != "home.ipynb":
+            name = nb_file.stem.replace("_", " ").title()
+            colab_url = f"https://colab.research.google.com/github/kokimoribe/python_exercises/blob/publish/notebooks/{nb_file.name}"
+            links.append(f"- [{name}]({colab_url})")
+    
+    cells.append(nbformat.v4.new_markdown_cell("\n".join(links)))
+    
+    notebook.cells = cells
+    
+    # Write the notebook
+    home_file = notebooks_dir / "home.ipynb"
+    with open(home_file, "w", encoding="utf-8") as f:
+        nbformat.write(notebook, f)
+    
+    print(f"Generated home notebook at {home_file}")
 
 def py_to_notebook(py_file: Path, notebook_file: Path):
     """
@@ -64,21 +99,26 @@ def py_to_notebook(py_file: Path, notebook_file: Path):
         # Split the file into sections based on the delimiter
         sections = [s.strip() for s in content.split("#################################################")]
         
-        # Create a new Jupyter notebook
+        # Create notebook
         notebook = nbformat.v4.new_notebook()
         cells = []
 
         # Add documentation markdown cell with formatted Colab link
         notebook_name = notebook_file.name
         cells.append(nbformat.v4.new_markdown_cell(COLLAB_BADGE.format(notebook_name=notebook_name)))
-        cells.append(nbformat.v4.new_markdown_cell("### README"))
-        cells.append(nbformat.v4.new_markdown_cell(NOTEBOOK_DOCS))
+        cells.append(nbformat.v4.new_markdown_cell(EXERCISE_DOCS))
 
-        # Add setup cell for ipytest
-        cells.append(nbformat.v4.new_markdown_cell("### Exercises"))
-        cells.append(nbformat.v4.new_code_cell(IPYTEST_SETUP))
+        # Extract setup code if it exists (first section starting with "# Setup")
+        custom_setup = ""
+        if sections and sections[0].strip().startswith("# Setup"):
+            custom_setup = "\n".join(sections[0].split('\n')[1:])  # Skip the "# Setup" line
+            sections = sections[1:]  # Remove setup section from further processing
 
-        # Process each section
+        # Add setup cell with custom code if any
+        setup_code = IPYTEST_SETUP.format(custom_setup=custom_setup)
+        cells.append(nbformat.v4.new_code_cell(setup_code))
+
+        # Process remaining sections
         for i, section in enumerate(sections):
             if not section.strip():  # Skip empty sections
                 continue
@@ -105,34 +145,27 @@ def py_to_notebook(py_file: Path, notebook_file: Path):
 
         # Ensure the output directory exists
         notebook_file.parent.mkdir(parents=True, exist_ok=True)
-
-        # Write the notebook to file
         with open(notebook_file, "w", encoding="utf-8") as f:
             nbformat.write(notebook, f)
 
         print(f"Successfully converted {py_file} to {notebook_file}")
         
-    except FileNotFoundError:
-        print(f"Error: Could not find the file {py_file}")
     except Exception as e:
-        print(f"An error occurred: {str(e)}")
+        print(f"An error occurred with {py_file}: {str(e)}")
 
 def main():
-    # Define source and output directories
+    # Setup directories
     src_dir = Path("src")
     notebooks_dir = Path("notebooks")
-
-    # Create notebooks directory if it doesn't exist
     notebooks_dir.mkdir(exist_ok=True)
 
-    # Find all Python files in src directory
-    python_files = src_dir.glob("*.py")
-
-    # Convert each file
-    for py_file in python_files:
-        # Create corresponding notebook path
+    # Convert Python files to notebooks
+    for py_file in src_dir.glob("*.py"):
         notebook_file = notebooks_dir / py_file.with_suffix('.ipynb').name
         py_to_notebook(py_file, notebook_file)
+    
+    # Generate home notebook
+    generate_home_notebook(notebooks_dir)
 
 if __name__ == "__main__":
     main()
